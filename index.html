@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BharatAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #0a0a14;
+  color: #fff;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%, rgba(255,100,0,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 100%, rgba(0,150,120,0.1) 0%, transparent 60%);
+}
+
+.page { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 20px 16px 80px; }
+
+/* HEADER */
+.header { text-align: center; padding: 32px 0 20px; }
+.flag-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,100,0,0.12); border: 1px solid rgba(255,150,0,0.3);
+  border-radius: 40px; padding: 5px 16px; margin-bottom: 12px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: #FFB300;
+  text-transform: uppercase;
+}
+.title {
+  font-size: clamp(1.9rem, 5vw, 3rem); font-weight: 800;
+  background: linear-gradient(135deg, #FF6600, #FFB300);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 6px;
+}
+.sub { font-size: 0.88rem; color: rgba(255,255,255,0.4); font-weight: 300; }
+.strip { display: flex; height: 3px; border-radius: 2px; margin: 18px 0; overflow: hidden; }
+.strip span:nth-child(1) { flex:1; background:#FF9933; }
+.strip span:nth-child(2) { flex:1; background:#ffffff; }
+.strip span:nth-child(3) { flex:1; background:#138808; }
+
+/* CARD */
+.card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,150,0,0.2);
+  border-radius: 16px; padding: 20px; margin-bottom: 14px;
+}
+.card-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #FFB300; margin-bottom: 12px;
+}
+
+/* API KEY */
+.api-wrap { display: flex; gap: 10px; flex-wrap: wrap; }
+.api-wrap input {
+  flex: 1; min-width: 220px;
+  background: rgba(0,0,0,0.4); border: 1px solid rgba(255,100,0,0.3);
+  border-radius: 10px; padding: 10px 14px; color: #fff;
+  font-family: 'Poppins', sans-serif; font-size: 0.85rem; outline: none;
+}
+.api-wrap input:focus { border-color: #FF6600; }
+.api-save {
+  padding: 10px 20px; border-radius: 10px; border: none;
+  background: rgba(255,100,0,0.2); color: #FF6600;
+  font-family: 'Poppins', sans-serif; font-size: 0.83rem; font-weight: 700;
+  cursor: pointer; transition: background 0.2s; white-space: nowrap;
+}
+.api-save:hover { background: rgba(255,100,0,0.35); }
+.api-hint { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 6px; }
+.api-hint a { color: rgba(255,179,0,0.5); }
+
+/* TEXTAREA */
+textarea {
+  width: 100%; min-height: 100px;
+  background: rgba(0,0,0,0.35); border: 1px solid rgba(255,150,0,0.2);
+  border-radius: 10px; color: #fff;
+  font-family: 'Poppins', sans-serif; font-size: 0.88rem;
+  padding: 12px; resize: vertical; outline: none;
+}
+textarea:focus { border-color: #FF6600; }
+textarea::placeholder { color: rgba(255,255,255,0.25); }
+
+/* GENDER */
+.gender-row { display: flex; gap: 12px; }
+.g-btn {
+  flex: 1; padding: 14px 10px; border-radius: 12px;
+  border: 2px solid rgba(255,150,0,0.2);
+  background: rgba(0,0,0,0.2); cursor: pointer;
+  font-family: 'Poppins', sans-serif; font-size: 0.85rem; font-weight: 600;
+  color: rgba(255,255,255,0.55); text-align: center; transition: all 0.22s;
+}
+.g-btn .big { font-size: 1.8rem; display: block; margin-bottom: 4px; }
+.g-btn:hover { border-color: #FFB300; color: #fff; }
+.g-btn.sel-girl { border-color: #E91E63; background: rgba(233,30,99,0.12); color: #E91E63; }
+.g-btn.sel-boy  { border-color: #42A5F5; background: rgba(66,165,245,0.12); color: #42A5F5; }
+
+/* STATES */
+.state-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px; max-height: 260px; overflow-y: auto; padding-right: 2px;
+}
+.state-grid::-webkit-scrollbar { width: 3px; }
+.state-grid::-webkit-scrollbar-thumb { background: #FF6600; border-radius: 2px; }
+.s-btn {
+  padding: 9px 6px; border-radius: 9px;
+  border: 1px solid rgba(255,150,0,0.2);
+  background: rgba(0,0,0,0.2); cursor: pointer;
+  font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 600;
+  color: rgba(255,255,255,0.55); text-align: center; transition: all 0.18s;
+}
+.s-btn .ico { display: block; font-size: 1.3rem; margin-bottom: 3px; }
+.s-btn:hover { border-color: #FFB300; color: #fff; }
+.s-btn.sel { border-color: #FF6600; background: rgba(255,100,0,0.15); color: #FF6600; }
+
+/* LANG */
+.lang-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.l-btn {
+  padding: 6px 13px; border-radius: 40px;
+  border: 1px solid rgba(255,150,0,0.2);
+  background: rgba(0,0,0,0.2); cursor: pointer;
+  font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600;
+  color: rgba(255,255,255,0.5); transition: all 0.18s;
+}
+.l-btn:hover { border-color: #00897B; color: #fff; }
+.l-btn.sel { border-color: #00897B; background: rgba(0,137,123,0.15); color: #4DB6AC; }
+
+/* MODE TABS */
+.mode-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.m-tab {
+  padding: 8px 16px; border-radius: 40px;
+  border: 1px solid rgba(255,150,0,0.2);
+  background: rgba(0,0,0,0.2); cursor: pointer;
+  font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600;
+  color: rgba(255,255,255,0.45); transition: all 0.18s;
+}
+.m-tab:hover { color: #fff; border-color: rgba(255,150,0,0.4); }
+.m-tab.sel { background: rgba(255,100,0,0.18); border-color: #FF6600; color: #FFB300; }
+
+/* GENERATE */
+.gen-btn {
+  width: 100%; padding: 16px; border-radius: 12px; border: none;
+  background: linear-gradient(135deg, #FF6600, #FFB300);
+  color: #fff; font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem; font-weight: 700; cursor: pointer;
+  transition: all 0.25s; letter-spacing: 0.04em;
+}
+.gen-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,102,0,0.35); }
+.gen-btn:active { transform: translateY(0); }
+.gen-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* OUTPUT */
+#output { display: none; }
+
+/* CHARACTER BOX */
+.char-box {
+  display: flex; align-items: center; gap: 14px;
+  background: rgba(255,100,0,0.06); border: 1px solid rgba(255,150,0,0.2);
+  border-radius: 13px; padding: 16px; margin-bottom: 12px;
+}
+.av-wrap {
+  width: 60px; height: 60px; min-width: 60px;
+  border-radius: 50%; background: rgba(255,100,0,0.1);
+  border: 2px solid #FF6600; display: flex;
+  align-items: center; justify-content: center; font-size: 2rem;
+}
+.char-info h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 3px; }
+.char-info .meta { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+.tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.tag {
+  font-size: 10px; font-weight: 600; padding: 2px 9px;
+  border-radius: 40px; background: rgba(255,179,0,0.1);
+  border: 1px solid rgba(255,179,0,0.25); color: #FFB300;
+}
+
+/* RESPONSE */
+.r-box {
+  background: rgba(0,0,0,0.25); border: 1px solid rgba(255,150,0,0.2);
+  border-radius: 12px; padding: 16px; margin-bottom: 12px;
+  min-height: 70px; line-height: 1.75; font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+.r-box.loading::after {
+  content: '▋'; color: #FF6600;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ACTION BUTTONS */
+.act-row { display: flex; gap: 9px; flex-wrap: wrap; }
+.a-btn {
+  padding: 8px 16px; border-radius: 40px;
+  border: 1px solid rgba(0,150,120,0.3);
+  background: rgba(0,137,123,0.1); color: #4DB6AC;
+  font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.18s;
+}
+.a-btn:hover { background: rgba(0,137,123,0.2); }
+.a-btn.spk { background: rgba(233,30,99,0.12); border-color: rgba(233,30,99,0.4); color: #F48FB1; }
+
+/* CHAT */
+.chat-msgs {
+  height: 260px; overflow-y: auto; padding: 12px;
+  background: rgba(0,0,0,0.18); border: 1px solid rgba(255,150,0,0.2);
+  border-radius: 12px; margin-bottom: 10px;
+  display: flex; flex-direction: column; gap: 9px;
+}
+.chat-msgs::-webkit-scrollbar { width: 3px; }
+.chat-msgs::-webkit-scrollbar-thumb { background: #FF6600; border-radius: 2px; }
+.msg {
+  max-width: 78%; padding: 9px 13px; border-radius: 12px;
+  font-size: 0.87rem; line-height: 1.6;
+}
+.msg.user {
+  align-self: flex-end;
+  background: rgba(255,100,0,0.18); border: 1px solid rgba(255,100,0,0.25); color: #fff;
+}
+.msg.ai {
+  align-self: flex-start;
+  background: rgba(0,0,0,0.3); border: 1px solid rgba(255,150,0,0.18); color: rgba(255,255,255,0.88);
+}
+.chat-input-row { display: flex; gap: 9px; }
+.chat-in {
+  flex: 1; background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,150,0,0.2); border-radius: 40px;
+  padding: 10px 16px; color: #fff;
+  font-family: 'Poppins', sans-serif; font-size: 0.87rem; outline: none;
+}
+.chat-in:focus { border-color: #FF6600; }
+.chat-send {
+  padding: 10px 20px; border-radius: 40px; border: none;
+  background: linear-gradient(135deg, #FF6600, #FFB300);
+  color: #fff; font-family: 'Poppins', sans-serif;
+  font-weight: 700; font-size: 0.87rem; cursor: pointer;
+}
+
+/* VOICE */
+.voice-wrap { text-align: center; padding: 20px 0; }
+.mic-btn {
+  width: 80px; height: 80px; border-radius: 50%;
+  border: 2px solid #FF6600;
+  background: rgba(255,100,0,0.15);
+  font-size: 2.2rem; cursor: pointer; transition: all 0.25s;
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-bottom: 12px;
+}
+.mic-btn:hover { transform: scale(1.08); }
+.mic-btn.on { animation: mic-pulse 1s ease-in-out infinite; border-color: #E91E63; background: rgba(233,30,99,0.2); }
+@keyframes mic-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(233,30,99,0.5); }
+  50% { box-shadow: 0 0 0 16px rgba(233,30,99,0); }
+}
+.v-status { font-size: 12px; color: rgba(255,255,255,0.4); }
+
+/* LOADING */
+.ld { display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.4); }
+.ld-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(255,100,0,0.2); border-top-color: #FF6600; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 480px) {
+  .char-box { flex-direction: column; text-align: center; }
+  .tags { justify-content: center; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="flag-badge">🇮🇳 BharatAI — India's AI Companion</div>
+    <div class="title">BharatAI</div>
+    <div class="sub">Script paste karo • AI select karo • Full India support</div>
+    <div class="strip"><span></span><span></span><span></span></div>
+  </div>
+
+  <!-- API KEY -->
+  <div class="card">
+    <div class="card-label">🔑 Anthropic API Key</div>
+    <div class="api-wrap">
+      <input type="password" id="apiKey" placeholder="sk-ant-api03-xxxxxxxx" autocomplete="off"/>
+      <button class="api-save" onclick="saveKey()">Save ✓</button>
+    </div>
+    <div class="api-hint">
+      Free key: <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> → API Keys → Create Key
+    </div>
+  </div>
+
+  <!-- SCRIPT -->
+  <div class="card">
+    <div class="card-label">📝 Step 1 — Script Paste Cheyyandi</div>
+    <textarea id="scriptTxt" placeholder="Yahan script paste karein... Telugu, Hindi, Tamil, English — any language! ✨"></textarea>
+  </div>
+
+  <!-- GENDER -->
+  <div class="card">
+    <div class="card-label">👫 Step 2 — AI Gender</div>
+    <div class="gender-row">
+      <button class="g-btn sel-girl" id="gGirl" onclick="pickGender('girl')">
+        <span class="big">👩</span>Girl — Ammaayi<br/><small style="font-weight:300;opacity:0.6;font-size:11px">Sundar, Smart</small>
+      </button>
+      <button class="g-btn" id="gBoy" onclick="pickGender('boy')">
+        <span class="big">👨</span>Boy — Abbayi<br/><small style="font-weight:300;opacity:0.6;font-size:11px">Dashing, Bold</small>
+      </button>
+    </div>
+  </div>
+
+  <!-- STATE -->
+  <div class="card">
+    <div class="card-label">🗺️ Step 3 — Indian State Select Cheyyandi</div>
+    <div class="state-grid" id="stateGrid"></div>
+  </div>
+
+  <!-- LANGUAGE -->
+  <div class="card">
+    <div class="card-label">🌐 Step 4 — Language</div>
+    <div class="lang-row" id="langRow"></div>
+  </div>
+
+  <!-- MODE -->
+  <div class="card">
+    <div class="card-label">⚡ Step 5 — Mode</div>
+    <div class="mode-row">
+      <button class="m-tab sel" id="tabScript" onclick="pickMode('script')">📜 Script</button>
+      <button class="m-tab"     id="tabChat"   onclick="pickMode('chat')">💬 Chat</button>
+      <button class="m-tab"     id="tabVoice"  onclick="pickMode('voice')">🎙️ Voice</button>
+      <button class="m-tab"     id="tabAvatar" onclick="pickMode('avatar')">🎭 Avatar</button>
+    </div>
+    <button class="gen-btn" id="genBtn" onclick="generate()">✨ Generate — BharatAI Activate Karo!</button>
+  </div>
+
+  <!-- OUTPUT -->
+  <div id="output">
+    <div class="card">
+      <div class="card-label">🌟 Your AI Companion</div>
+      <div class="char-box" id="charBox"></div>
+
+      <div id="panelScript">
+        <div class="r-box" id="rBox">Response yahan aayega...</div>
+        <div class="act-row">
+          <button class="a-btn" id="spkBtn" onclick="toggleSpeak()">🔊 Listen</button>
+          <button class="a-btn" onclick="regen()">🔄 Regenerate</button>
+          <button class="a-btn" id="cpyBtn" onclick="doCopy()">📋 Copy</button>
+        </div>
+      </div>
+
+      <div id="panelChat" style="display:none">
+        <div class="chat-msgs" id="chatMsgs"></div>
+        <div class="chat-input-row">
+          <input class="chat-in" id="chatIn" placeholder="Message type karein..." onkeydown="if(event.key==='Enter'){event.preventDefault();sendMsg();}"/>
+          <button class="chat-send" onclick="sendMsg()">Send ➤</button>
+        </div>
+      </div>
+
+      <div id="panelVoice" style="display:none">
+        <div class="voice-wrap">
+          <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎤</button>
+          <br/>
+          <div class="v-status" id="vStatus">Mic press karein baat karne ke liye</div>
+          <div class="r-box" id="vBox" style="margin-top:12px;min-height:50px;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+var STATES = [
+  {n:"Andhra Pradesh",   e:"🌶️", l:"Telugu",    t:["Spicy","Warm","Vibrant"]},
+  {n:"Telangana",        e:"🏛️", l:"Telugu",    t:["Royal","Bold","Proud"]},
+  {n:"Tamil Nadu",       e:"🏺", l:"Tamil",     t:["Classical","Wise","Graceful"]},
+  {n:"Karnataka",        e:"🌿", l:"Kannada",   t:["Cultural","Gentle","Smart"]},
+  {n:"Kerala",           e:"🥥", l:"Malayalam", t:["Serene","Educated","Calm"]},
+  {n:"Maharashtra",      e:"🏙️", l:"Marathi",   t:["Ambitious","Modern","Strong"]},
+  {n:"Gujarat",          e:"💎", l:"Gujarati",  t:["Cheerful","Warm","Smart"]},
+  {n:"Rajasthan",        e:"🏜️", l:"Hindi",     t:["Royal","Colorful","Brave"]},
+  {n:"Punjab",           e:"🌾", l:"Punjabi",   t:["Energetic","Fun","Warm"]},
+  {n:"West Bengal",      e:"🎨", l:"Bengali",   t:["Artistic","Intellectual","Sweet"]},
+  {n:"Delhi",            e:"🏛️", l:"Hindi",     t:["Confident","Modern","Stylish"]},
+  {n:"Uttar Pradesh",    e:"🕌", l:"Hindi",     t:["Historical","Diverse","Rich"]},
+  {n:"Bihar",            e:"📚", l:"Hindi",     t:["Determined","Scholarly","Strong"]},
+  {n:"Odisha",           e:"🛕", l:"Odia",      t:["Artistic","Peaceful","Spiritual"]},
+  {n:"Assam",            e:"🍵", l:"Assamese",  t:["Natural","Calm","Beautiful"]},
+  {n:"Himachal Pradesh", e:"🏔️", l:"Hindi",     t:["Fresh","Serene","Pure"]},
+  {n:"Goa",              e:"🏖️", l:"Konkani",   t:["Vibrant","Free","Chill"]},
+  {n:"Jharkhand",        e:"⛏️", l:"Hindi",     t:["Strong","Honest","Brave"]},
+  {n:"Chhattisgarh",     e:"🌳", l:"Hindi",     t:["Natural","Warm","Earthy"]},
+  {n:"Uttarakhand",      e:"🏞️", l:"Hindi",     t:["Pure","Spiritual","Humble"]},
+  {n:"Haryana",          e:"🏋️", l:"Haryanvi",  t:["Athletic","Direct","Bold"]},
+  {n:"Madhya Pradesh",   e:"🐯", l:"Hindi",     t:["Heartland","Vibrant","Warm"]},
+  {n:"Manipur",          e:"💃", l:"Meitei",    t:["Graceful","Artistic","Brave"]},
+  {n:"Meghalaya",        e:"🌧️", l:"Khasi",     t:["Natural","Peaceful","Serene"]}
+];
+var GN = {"Andhra Pradesh":"Priya","Telangana":"Sravani","Tamil Nadu":"Kavitha","Karnataka":"Deepa","Kerala":"Anjali","Maharashtra":"Sneha","Gujarat":"Pooja","Rajasthan":"Radha","Punjab":"Gurpreet","West Bengal":"Diya","Delhi":"Anika","default":"Priya"};
+var BN = {"Andhra Pradesh":"Arjun","Telangana":"Rahul","Tamil Nadu":"Karthik","Karnataka":"Vikram","Kerala":"Arun","Maharashtra":"Rohit","Gujarat":"Dhruv","Rajasthan":"Rajveer","Punjab":"Harjot","West Bengal":"Abhijit","Delhi":"Ankit","default":"Arjun"};
+var GA = {"Andhra Pradesh":"👩‍🦱","Telangana":"👩‍💼","Tamil Nadu":"👩‍🎓","Karnataka":"👩‍🔬","Kerala":"👩‍🏫","Maharashtra":"👩‍💻","Gujarat":"👩‍🎤","Rajasthan":"👰","Punjab":"👩‍🌾","West Bengal":"👩‍🎨","default":"👩"};
+var BA = {"Andhra Pradesh":"👨‍💼","Telangana":"🧑‍💻","Tamil Nadu":"👨‍🎓","Karnataka":"👨‍🔬","Kerala":"👨‍🏫","Maharashtra":"👨‍💻","Gujarat":"👨‍💼","Rajasthan":"🤴","Punjab":"👨‍🌾","West Bengal":"👨‍🎨","default":"👨"};
+var LANGS = ["Telugu","Hindi","Tamil","Kannada","Malayalam","Marathi","Bengali","Gujarati","Punjabi","Odia","Assamese","English"];
+
+var gender = 'girl', curState = STATES[0], curLang = 'Telugu', curMode = 'script';
+var isSpeaking = false, isListening = false;
+var aiName = 'Priya', aiAv = '👩', curText = '', chatHistory = [];
+var synth = window.speechSynthesis, voicesList = [];
+
+window.onload = function() {
+  try { var k = localStorage.getItem('bai_key'); if (k) document.getElementById('apiKey').value = k; } catch(e){}
+  voicesList = synth.getVoices();
+  if (!voicesList.length) synth.onvoiceschanged = function() { voicesList = synth.getVoices(); };
+  buildStates();
+  buildLangs();
+};
+
+function buildStates() {
+  var g = document.getElementById('stateGrid');
+  g.innerHTML = '';
+  STATES.forEach(function(s, i) {
+    var b = document.createElement('button');
+    b.className = 's-btn' + (i === 0 ? ' sel' : '');
+    b.id = 'sb' + i;
+    b.innerHTML = '<span class="ico">' + s.e + '</span>' + s.n;
+    b.addEventListener('click', (function(idx){ return function(){ pickState(idx); }; })(i));
+    g.appendChild(b);
+  });
+}
+
+function buildLangs() {
+  var r = document.getElementById('langRow');
+  r.innerHTML = '';
+  LANGS.forEach(function(l) {
+    var b = document.createElement('button');
+    b.className = 'l-btn' + (l === curLang ? ' sel' : '');
+    b.textContent = l;
+    b.addEventListener('click', (function(lang){ return function(){ pickLang(lang); }; })(l));
+    r.appendChild(b);
+  });
+}
+
+function saveKey() {
+  var k = document.getElementById('apiKey').value.trim();
+  if (!k) { alert('API Key enter cheyyandi!'); return; }
+  try { localStorage.setItem('bai_key', k); } catch(e){}
+  var inp = document.getElementById('apiKey');
+  inp.style.borderColor = '#00897B';
+  setTimeout(function(){ inp.style.borderColor = ''; }, 2000);
+  alert('✅ API Key saved!');
+}
+
+function pickGender(g) {
+  gender = g;
+  document.getElementById('gGirl').className = 'g-btn' + (g === 'girl' ? ' sel-girl' : '');
+  document.getElementById('gBoy').className  = 'g-btn' + (g === 'boy'  ? ' sel-boy'  : '');
+}
+
+function pickState(idx) {
+  curState = STATES[idx];
+  document.querySelectorAll('.s-btn').forEach(function(b){ b.classList.remove('sel'); });
+  document.getElementById('sb' + idx).classList.add('sel');
+  pickLang(curState.l);
+}
+
+function pickLang(l) {
+  curLang = l;
+  document.querySelectorAll('.l-btn').forEach(function(b){
+    b.classList.toggle('sel', b.textContent === l);
+  });
+}
+
+function pickMode(m) {
+  curMode = m;
+  ['script','chat','voice','avatar'].forEach(function(x) {
+    var t = document.getElementById('tab' + x.charAt(0).toUpperCase() + x.slice(1));
+    if (t) t.className = 'm-tab' + (x === m ? ' sel' : '');
+  });
+}
+
+async function generate() {
+  var script = document.getElementById('scriptTxt').value.trim();
+  if (!script) { alert('Script paste cheyyandi! ✍️'); return; }
+  var key = document.getElementById('apiKey').value.trim();
+  if (!key) { alert('API Key required! 🔑\n\nconsole.anthropic.com → API Keys → Create Key\nCopy chesi paina box lo paste cheyyandi.'); return; }
+
+  var btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="ld"><span class="ld-dot"></span> Generating...</span>';
+
+  var out = document.getElementById('output');
+  out.style.display = 'block';
+  renderChar();
+
+  document.getElementById('panelScript').style.display = 'none';
+  document.getElementById('panelChat').style.display = 'none';
+  document.getElementById('panelVoice').style.display = 'none';
+
+  try {
+    if (curMode === 'chat') {
+      document.getElementById('panelChat').style.display = 'block';
+      document.getElementById('chatMsgs').innerHTML = '';
+      chatHistory = [];
+      await startChat(script, key);
+    } else if (curMode === 'voice') {
+      document.getElementById('panelVoice').style.display = 'block';
+    } else {
+      document.getElementById('panelScript').style.display = 'block';
+      await doScript(script, key);
+    }
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '✨ Generate — BharatAI Activate Karo!';
+  out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderChar() {
+  aiName = (gender === 'girl' ? GN : BN)[curState.n] || (gender === 'girl' ? GN : BN)['default'];
+  aiAv   = (gender === 'girl' ? GA : BA)[curState.n] || (gender === 'girl' ? GA : BA)['default'];
+  var tags = curState.t.map(function(t){ return '<span class="tag">'+t+'</span>'; }).join('');
+  tags += '<span class="tag">'+curLang+'</span><span class="tag">India 🇮🇳</span>';
+  document.getElementById('charBox').innerHTML =
+    '<div class="av-wrap">'+aiAv+'</div>' +
+    '<div class="char-info">' +
+      '<h3>'+aiName+' — '+curState.n+(gender==='girl'?' ✨':' ⚡')+'</h3>' +
+      '<div class="meta">'+curLang+' • '+curMode.toUpperCase()+' mode</div>' +
+      '<div class="tags">'+tags+'</div>' +
+    '</div>';
+}
+
+async function doScript(script, key) {
+  var box = document.getElementById('rBox');
+  box.textContent = ''; box.classList.add('loading');
+  var res = await callAPI(key, buildSys(), [{role:'user', content:'Respond as '+aiName+' from '+curState.n+' in '+curLang+' (mix English ok). Natural and authentic:\n\n'+script}]);
+  box.classList.remove('loading');
+  box.textContent = res; curText = res;
+  setTimeout(function(){ speakText(res); }, 400);
+}
+
+async function startChat(script, key) {
+  var sys = buildSys() + '\nContext: "'+script+'"\nMax 3 sentences per reply.';
+  var msgs = [{role:'user', content:'Introduce yourself as '+aiName+' from '+curState.n+' in 2 warm sentences!'}];
+  var res = await callAPI(key, sys, msgs);
+  addMsg(res, 'ai');
+  chatHistory.push(msgs[0]);
+  chatHistory.push({role:'assistant', content:res});
+}
+
+async function sendMsg() {
+  var inp = document.getElementById('chatIn');
+  var msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  var key = document.getElementById('apiKey').value.trim();
+  if (!key) { alert('API Key required!'); return; }
+  addMsg(msg, 'user');
+  chatHistory.push({role:'user', content:msg});
+  var ld = document.createElement('div');
+  ld.className = 'msg ai';
+  ld.innerHTML = '<span class="ld"><span class="ld-dot"></span></span>';
+  document.getElementById('chatMsgs').appendChild(ld);
+  scrollMsgs();
+  try {
+    var res = await callAPI(key, buildSys()+' Short 2-3 sentences.', chatHistory);
+    ld.remove(); addMsg(res, 'ai');
+    chatHistory.push({role:'assistant', content:res});
+    speakText(res);
+  } catch(e) { ld.textContent = '⚠️ Error: '+e.message; }
+}
+
+function addMsg(text, role) {
+  var c = document.getElementById('chatMsgs');
+  var d = document.createElement('div');
+  d.className = 'msg '+role;
+  d.textContent = (role==='ai' ? aiAv+' ' : '') + text;
+  c.appendChild(d); scrollMsgs();
+}
+function scrollMsgs() { var c = document.getElementById('chatMsgs'); c.scrollTop = c.scrollHeight; }
+
+function toggleMic() {
+  if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+    document.getElementById('vStatus').textContent = '⚠️ Chrome use cheyyandi for voice!'; return;
+  }
+  if (isListening) { isListening = false; document.getElementById('micBtn').classList.remove('on'); return; }
+  var key = document.getElementById('apiKey').value.trim();
+  if (!key) { alert('API Key required!'); return; }
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var rec = new SR();
+  var lmap = {Telugu:'te-IN',Hindi:'hi-IN',Tamil:'ta-IN',Kannada:'kn-IN',Malayalam:'ml-IN',Bengali:'bn-IN',Marathi:'mr-IN',Gujarati:'gu-IN',Punjabi:'pa-IN'};
+  rec.lang = lmap[curLang] || 'en-IN';
+  rec.interimResults = false;
+  isListening = true;
+  document.getElementById('micBtn').classList.add('on');
+  document.getElementById('vStatus').textContent = '🔴 Listening... Boliye!';
+  rec.onresult = async function(e) {
+    var said = e.results[0][0].transcript;
+    isListening = false; document.getElementById('micBtn').classList.remove('on');
+    document.getElementById('vStatus').textContent = 'You said: "'+said+'"';
+    var vb = document.getElementById('vBox');
+    vb.textContent = ''; vb.classList.add('loading');
+    try {
+      var res = await callAPI(key, buildSys()+' Short 2-sentence reply.', [{role:'user',content:said}]);
+      vb.classList.remove('loading'); vb.textContent = res; speakText(res);
+    } catch(ex) { vb.classList.remove('loading'); vb.textContent = '⚠️ '+ex.message; }
+    document.getElementById('vStatus').textContent = 'Mic press karein baat karne ke liye';
+  };
+  rec.onerror = function(e) { isListening = false; document.getElementById('micBtn').classList.remove('on'); document.getElementById('vStatus').textContent = '⚠️ '+e.error; };
+  rec.onend = function() { isListening = false; document.getElementById('micBtn').classList.remove('on'); };
+  try { rec.start(); } catch(e) {}
+}
+
+function speakText(text) {
+  if (!synth || !text) return;
+  synth.cancel();
+  if (!voicesList.length) voicesList = synth.getVoices();
+  var utt = new SpeechSynthesisUtterance(text);
+  var chosen = null;
+  var prefs = ['en-IN','hi-IN','te-IN','ta-IN'];
+  for (var p = 0; p < prefs.length && !chosen; p++)
+    for (var v = 0; v < voicesList.length; v++)
+      if (voicesList[v].lang === prefs[p]) { chosen = voicesList[v]; break; }
+  if (!chosen)
+    for (var v = 0; v < voicesList.length; v++)
+      if (voicesList[v].name.toLowerCase().indexOf('india') !== -1) { chosen = voicesList[v]; break; }
+  if (chosen) utt.voice = chosen;
+  utt.rate = 0.88; utt.pitch = gender === 'girl' ? 1.2 : 0.85;
+  var btn = document.getElementById('spkBtn');
+  utt.onstart = function() { isSpeaking = true; if(btn){btn.textContent='🔇 Stop';btn.classList.add('spk');} };
+  utt.onend = utt.onerror = function() { isSpeaking = false; if(btn){btn.textContent='🔊 Listen';btn.classList.remove('spk');} };
+  synth.speak(utt);
+}
+
+function toggleSpeak() {
+  if (isSpeaking) { synth.cancel(); } else { speakText(curText); }
+}
+
+function regen() {
+  var s = document.getElementById('scriptTxt').value.trim();
+  var k = document.getElementById('apiKey').value.trim();
+  if (s && k) doScript(s, k); else alert('Script & API key required!');
+}
+
+function doCopy() {
+  if (!curText) return;
+  var btn = document.getElementById('cpyBtn');
+  function done() { btn.textContent = '✅ Copied!'; setTimeout(function(){ btn.textContent = '📋 Copy'; }, 2000); }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(curText).then(done).catch(fallback);
+  } else { fallback(); }
+  function fallback() {
+    var ta = document.createElement('textarea');
+    ta.value = curText; ta.style.cssText = 'position:fixed;opacity:0;';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand('copy'); done(); } catch(e){}
+    document.body.removeChild(ta);
+  }
+}
+
+function buildSys() {
+  return 'You are '+aiName+', an intelligent AI from '+curState.n+', India.\n'+
+    'Speak '+curLang+' naturally (mix English ok).\n'+
+    'Personality: '+curState.t.join(', ')+'.\n'+
+    'You are '+(gender==='girl'?'a warm charming Indian woman':'a smart dashing Indian man')+'.\n'+
+    'Respond in '+curLang+', warmly and authentically.';
+}
+
+async function callAPI(key, system, messages) {
+  var resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: system, messages: messages })
+  });
+  var data = await resp.json();
+  if (!resp.ok) throw new Error((data.error && data.error.message) || ('HTTP ' + resp.status));
+  return data.content.filter(function(c){ return c.type==='text'; }).map(function(c){ return c.text; }).join('');
+}
+</script>
+</body>
+</html>
