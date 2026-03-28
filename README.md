@@ -1,3 +1,4 @@
+
 <script>
 const genBtn = document.querySelector(".gen-btn");
 const output = document.getElementById("output");
